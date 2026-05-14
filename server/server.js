@@ -7,9 +7,10 @@ const cors = require("cors");
 
 const app = express();
 
-// Middleware
 app.use(cors());
 app.use(express.json());
+
+console.log("🚀 Server starting...");
 
 // Test route
 app.get("/", (req, res) => {
@@ -20,27 +21,31 @@ app.get("/", (req, res) => {
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/tasks", require("./routes/taskRoutes"));
 
-const PORT = process.env.PORT || 5000;
+// 🔥 DEBUG MONGO URI
+console.log("MONGO_URI:", process.env.MONGO_URI);
 
-// 🟢 SAFE MONGODB CONNECTION (IMPORTANT FIX)
+// MongoDB connection (SAFE)
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log("MongoDB Connected");
 
+    const PORT = process.env.PORT || 5000;
+
     app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
+      console.log("Server running on port", PORT);
     });
 
   })
   .catch((err) => {
-    console.log("MongoDB Connection Error:", err);
+    console.log("❌ MongoDB ERROR:");
+    console.log(err);
   });
 
-// 🟡 EXTRA SAFETY (helps debugging on Render)
+// Extra crash debug
 process.on("uncaughtException", (err) => {
-  console.log("Uncaught Exception:", err);
+  console.log("❌ Uncaught Exception:", err);
 });
 
 process.on("unhandledRejection", (err) => {
-  console.log("Unhandled Rejection:", err);
+  console.log("❌ Unhandled Rejection:", err);
 });
