@@ -1,19 +1,22 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import API from "../services/api";
 
-function Login() {
+const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const navigate = useNavigate();
-
-  const handleLogin = async (e) => {
-    e.preventDefault();
-
-    console.log("Login clicked");
+  const handleLogin = async () => {
+    if (!email || !password) {
+      alert("Please enter email and password");
+      return;
+    }
 
     try {
+      setLoading(true);
+
+      console.log("Login clicked");
+
       const res = await API.post("/auth/login", {
         email,
         password,
@@ -21,45 +24,42 @@ function Login() {
 
       console.log("Login Success:", res.data);
 
-      // save token
       localStorage.setItem("token", res.data.token);
 
-      // redirect to dashboard
-      navigate("/dashboard");
+      alert("Login successful");
+
+      window.location.href = "/tasks";
 
     } catch (err) {
       console.log("Login Error:", err.response?.data || err.message);
-      alert("Login failed");
+      alert(err.response?.data?.message || "Login failed");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div style={{ padding: "20px" }}>
+    <div className="login-container">
       <h2>Login</h2>
 
-      <form onSubmit={handleLogin}>
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
+      <input
+        value={email}
+        placeholder="Email"
+        onChange={(e) => setEmail(e.target.value)}
+      />
 
-        <br /><br />
+      <input
+        value={password}
+        type="password"
+        placeholder="Password"
+        onChange={(e) => setPassword(e.target.value)}
+      />
 
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-
-        <br /><br />
-
-        <button type="submit">Login</button>
-      </form>
+      <button onClick={handleLogin} disabled={loading}>
+        {loading ? "Logging in..." : "Login"}
+      </button>
     </div>
   );
-}
+};
 
 export default Login;
