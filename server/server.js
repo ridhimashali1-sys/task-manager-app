@@ -7,6 +7,7 @@ const cors = require("cors");
 
 const app = express();
 
+// Middleware
 app.use(cors());
 app.use(express.json());
 
@@ -21,10 +22,9 @@ app.get("/", (req, res) => {
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/tasks", require("./routes/taskRoutes"));
 
-// 🔥 DEBUG MONGO URI
 console.log("MONGO_URI:", process.env.MONGO_URI);
 
-// MongoDB connection (SAFE)
+// MongoDB connection
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log("MongoDB Connected");
@@ -34,14 +34,12 @@ mongoose.connect(process.env.MONGO_URI)
     app.listen(PORT, () => {
       console.log("Server running on port", PORT);
     });
-
   })
   .catch((err) => {
-    console.log("❌ MongoDB ERROR:");
-    console.log(err);
+    console.log("❌ MongoDB Connection Error:", err);
   });
 
-// Extra crash debug
+// Safety handlers
 process.on("uncaughtException", (err) => {
   console.log("❌ Uncaught Exception:", err);
 });
