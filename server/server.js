@@ -16,20 +16,31 @@ app.get("/", (req, res) => {
   res.send("Task Manager API Running");
 });
 
-// 🔐 Auth routes
+// Routes
 app.use("/api/auth", require("./routes/authRoutes"));
-
-// 📋 Task routes (IMPORTANT)
 app.use("/api/tasks", require("./routes/taskRoutes"));
 
-// MongoDB connection
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log("MongoDB Connected"))
-  .catch((err) => console.log(err));
-
-// Server start
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+// 🟢 SAFE MONGODB CONNECTION (IMPORTANT FIX)
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => {
+    console.log("MongoDB Connected");
+
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+
+  })
+  .catch((err) => {
+    console.log("MongoDB Connection Error:", err);
+  });
+
+// 🟡 EXTRA SAFETY (helps debugging on Render)
+process.on("uncaughtException", (err) => {
+  console.log("Uncaught Exception:", err);
+});
+
+process.on("unhandledRejection", (err) => {
+  console.log("Unhandled Rejection:", err);
 });
