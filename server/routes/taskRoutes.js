@@ -1,10 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const Task = require("../models/Task");
-const auth = require("../middleware/auth");
+
+// ✅ FIXED IMPORT (IMPORTANT)
+const auth = require("../middleware/authMiddleware");
 
 
-// ✅ GET ALL TASKS
+// GET ALL TASKS
 router.get("/", auth, async (req, res) => {
   try {
     const tasks = await Task.find({ userId: req.user.id });
@@ -15,7 +17,7 @@ router.get("/", auth, async (req, res) => {
 });
 
 
-// ✅ CREATE TASK
+// CREATE TASK
 router.post("/", auth, async (req, res) => {
   try {
     const { title, description } = req.body;
@@ -35,7 +37,7 @@ router.post("/", auth, async (req, res) => {
 });
 
 
-// ✏️ UPDATE TASK (EDIT FEATURE)
+// UPDATE TASK (EDIT)
 router.put("/:id", auth, async (req, res) => {
   try {
     const updatedTask = await Task.findOneAndUpdate(
@@ -56,7 +58,7 @@ router.put("/:id", auth, async (req, res) => {
 });
 
 
-// ❌ DELETE TASK
+// DELETE TASK
 router.delete("/:id", auth, async (req, res) => {
   try {
     const deletedTask = await Task.findOneAndDelete({
